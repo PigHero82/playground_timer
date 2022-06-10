@@ -9,6 +9,14 @@ const DefaultRoute = '/timer'
 // ** Merge Routes
 const Routes = [
   {
+    path: '/timer',
+    component: lazy(() => import('../../views/Home'))
+  },
+  {
+    path: '/stopwatch',
+    component: lazy(() => import('../../views/SecondPage'))
+  },
+  {
     path: '/login',
     component: lazy(() => import('../../views/Login')),
     layout: 'BlankLayout',
