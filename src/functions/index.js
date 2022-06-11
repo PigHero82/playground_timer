@@ -1,3 +1,3 @@
-import Alert from "./Alert"
+import { Alert, SweetAlert } from "./alerts"
 
-export { Alert }
+export { Alert, SweetAlert }
