@@ -9,13 +9,20 @@ import Avatar from '@components/avatar'
 // import { isUserLoggedIn } from '@utils'
 
 // ** Third Party Components
-import { User, Mail, CheckSquare, MessageSquare, Settings, CreditCard, HelpCircle, Power } from 'react-feather'
+import { 
+  // User, Mail, CheckSquare, MessageSquare, Settings, CreditCard, HelpCircle, 
+  Power 
+} from 'react-feather'
 
 // ** Reactstrap Imports
 import { UncontrolledDropdown, DropdownMenu, DropdownToggle, DropdownItem } from 'reactstrap'
 
 // ** Default Avatar Image
 import defaultAvatar from '@src/assets/images/avatars/avatar-blank.png'
+
+// Redux
+import { useDispatch, useSelector } from 'react-redux'
+import { handleLogout } from '../../../../redux/authentication'
 
 const UserDropdown = () => {
   // ** State
@@ -30,17 +37,21 @@ const UserDropdown = () => {
 
   //** Vars
   const userAvatar = (userData && userData.avatar) || defaultAvatar
+  const data = useSelector((state) => state.auth.userData)
+
+  // Hooks
+  const dispatch = useDispatch()
 
   return (
     <UncontrolledDropdown tag='li' className='dropdown-user nav-item'>
       <DropdownToggle href='/' tag='a' className='nav-link dropdown-user-link' onClick={e => e.preventDefault()}>
         <div className='user-nav d-sm-flex d-none'>
-          <span className='user-name fw-bold'>{(userData && userData['username']) || 'User'}</span>
+          <span className='user-name fw-bold'>{data?.nama || 'User'}</span>
         </div>
         <Avatar img={userAvatar} imgHeight='40' imgWidth='40' status='online' />
       </DropdownToggle>
-      {/* <DropdownMenu end>
-        <DropdownItem tag='a' href='/pages/profile' onClick={e => e.preventDefault()}>
+      <DropdownMenu end>
+        {/* <DropdownItem tag='a' href='/pages/profile' onClick={e => e.preventDefault()}>
           <User size={14} className='me-75' />
           <span className='align-middle'>Profile</span>
         </DropdownItem>
@@ -68,12 +79,12 @@ const UserDropdown = () => {
         <DropdownItem tag='a' href='/pages/faq' onClick={e => e.preventDefault()}>
           <HelpCircle size={14} className='me-75' />
           <span className='align-middle'>FAQ</span>
-        </DropdownItem>
-        <DropdownItem tag={Link} to='/login'>
+        </DropdownItem> */}
+        <DropdownItem tag={Link} to='/login' onClick={() => dispatch(handleLogout())}>
           <Power size={14} className='me-75' />
-          <span className='align-middle'>Logout</span>
+          <span className='align-middle'>Keluar</span>
         </DropdownItem>
-      </DropdownMenu> */}
+      </DropdownMenu>
     </UncontrolledDropdown>
   )
 }

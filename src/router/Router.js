@@ -4,6 +4,7 @@ import { Suspense, lazy, Fragment } from 'react'
 // ** Utils
 import { useLayout } from '@hooks/useLayout'
 import { useRouterTransition } from '@hooks/useRouterTransition'
+import { isUserLoggedIn } from '@utils'
 
 // ** Custom Components
 import LayoutWrapper from '@layouts/components/layout-wrapper'
@@ -59,39 +60,40 @@ const Router = () => {
   /**
    ** Final Route Component Checks for Login & User Role and then redirects to the route
    */
-  // const FinalRoute = props => {
-  //   const route = props.route
-  //   let action, resource
+  const FinalRoute = props => {
+    const route = props.route
+    // let action, resource
 
-  //   // ** Assign vars based on route meta
-  //   if (route.meta) {
-  //     action = route.meta.action ? route.meta.action : null
-  //     resource = route.meta.resource ? route.meta.resource : null
-  //   }
+    // ** Assign vars based on route meta
+    // if (route.meta) {
+    //   action = route.meta.action ? route.meta.action : null
+    //   resource = route.meta.resource ? route.meta.resource : null
+    // }
 
-  //   if (
-  //     (!isUserLoggedIn() && route.meta === undefined) ||
-  //     (!isUserLoggedIn() && route.meta && !route.meta.authRoute && !route.meta.publicRoute)
-  //   ) {
-  //     /**
-  //      ** If user is not Logged in & route meta is undefined
-  //      ** OR
-  //      ** If user is not Logged in & route.meta.authRoute, !route.meta.publicRoute are undefined
-  //      ** Then redirect user to login
-  //      */
+    // if (!isUserLoggedIn()) {
+    if (
+      (!isUserLoggedIn() && route.meta === undefined) ||
+      (!isUserLoggedIn() && route.meta && !route.meta.authRoute && !route.meta.publicRoute)
+    ) {
+      /**
+       ** If user is not Logged in & route meta is undefined
+       ** OR
+       ** If user is not Logged in & route.meta.authRoute, !route.meta.publicRoute are undefined
+       ** Then redirect user to login
+       */
 
-  //     return <Redirect to='/login' />
-  //   } else if (route.meta && route.meta.authRoute && isUserLoggedIn()) {
-  //     // ** If route has meta and authRole and user is Logged in then redirect user to home page (DefaultRoute)
-  //     return <Redirect to='/' />
-  //   } else if (isUserLoggedIn() && !ability.can(action || 'read', resource)) {
-  //     // ** If user is Logged in and doesn't have ability to visit the page redirect the user to Not Authorized
-  //     return <Redirect to='/misc/not-authorized' />
-  //   } else {
-  //     // ** If none of the above render component
-  //     return <route.component {...props} />
-  //   }
-  // }
+      return <Redirect to='/login' />
+    } else if (route.meta && route.meta.authRoute && isUserLoggedIn()) {
+      // ** If route has meta and authRole and user is Logged in then redirect user to home page (DefaultRoute)
+      return <Redirect to='/' />
+    // } else if (isUserLoggedIn() && !ability.can(action || 'read', resource)) {
+    //   // ** If user is Logged in and doesn't have ability to visit the page redirect the user to Not Authorized
+    //   return <Redirect to='/misc/not-authorized' />
+    } else {
+      // ** If none of the above render component
+      return <route.component {...props} />
+    }
+  }
 
   // ** Return Route to Render
   const ResolveRoutes = () => {
@@ -143,7 +145,8 @@ const Router = () => {
 
                           {route.layout === 'BlankLayout' ? (
                             <Fragment>
-                              <route.component {...props} />
+                              <FinalRoute route={route} {...props} />
+                              {/* <route.component {...props} /> */}
                             </Fragment>
                           ) : (
                             <LayoutWrapper
@@ -170,7 +173,8 @@ const Router = () => {
                               /*eslint-enable */
                             >
                               <Suspense fallback={null}>
-                                <route.component {...props} />
+                                <FinalRoute route={route} {...props} />
+                                {/* <route.component {...props} /> */}
                               </Suspense>
                             </LayoutWrapper>
                           )}
