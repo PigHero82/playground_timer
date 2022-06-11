@@ -7,10 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 
 // Components
-import { 
-  Card, CardBody, CardHeader, CardText,
-  CardTitle, Form 
-} from "reactstrap"
+import { Card, CardBody, CardText, Form } from "reactstrap"
 import { ActionButton, Input } from '../components'
 
 // Config
@@ -22,6 +19,7 @@ import { handleLogin } from '../redux/authentication'
 
 // Router
 import { useHistory } from 'react-router-dom'
+import { Alert } from '../functions'
 
 const LoginCover = () => {
   // Hooks
@@ -48,6 +46,8 @@ const LoginCover = () => {
         refreshToken: ""
       }))
 
+      Alert('success', 'Autentikasi Berhasil', `Selamat datang, ${value.nama}`)
+
       history.push('/')
     }
   
@@ -67,10 +67,13 @@ const LoginCover = () => {
           name="nama"
           register={register}
           errors={errors.nama}
+          autoFocus
         />
 
         <div className='text-end'>
-          <ActionButton type='submit' />
+          <ActionButton type='submit'>
+            Masuk
+          </ActionButton>
         </div>
       </Form>
     )
@@ -84,12 +87,10 @@ const LoginCover = () => {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>
-              Selamat Datang
-            </CardTitle>
-          </CardHeader>
           <CardBody>
+            <div className='text-center mb-1'>
+              <h2>Playground Timer</h2>
+            </div>
             <CardText>
               Silahkan isi kolom dibawah sebelum lanjut ke halaman berikutnya
             </CardText>

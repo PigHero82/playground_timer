@@ -1,5 +1,5 @@
 // ** React Imports
-import { Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useState } from 'react'
 
 // ** Custom Components
@@ -24,6 +24,9 @@ import defaultAvatar from '@src/assets/images/avatars/avatar-blank.png'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleLogout } from '../../../../redux/authentication'
 
+// Functions
+import { SweetAlert } from '../../../../functions'
+
 const UserDropdown = () => {
   // ** State
   const [userData] = useState(null)
@@ -41,6 +44,7 @@ const UserDropdown = () => {
 
   // Hooks
   const dispatch = useDispatch()
+  const history = useHistory()
 
   return (
     <UncontrolledDropdown tag='li' className='dropdown-user nav-item'>
@@ -80,7 +84,18 @@ const UserDropdown = () => {
           <HelpCircle size={14} className='me-75' />
           <span className='align-middle'>FAQ</span>
         </DropdownItem> */}
-        <DropdownItem tag={Link} to='/login' onClick={() => dispatch(handleLogout())}>
+        <DropdownItem tag='a' onClick={e => {
+            e.preventDefault()
+
+            SweetAlert().then(function (result) {
+              if (result.value) {
+                dispatch(handleLogout())
+
+                history.push('/')
+              }
+            })
+          }}
+        >
           <Power size={14} className='me-75' />
           <span className='align-middle'>Keluar</span>
         </DropdownItem>
