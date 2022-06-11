@@ -10,10 +10,10 @@ import {
 import { 
   Card, CardHeader, CardBody, CardTitle, 
   Row, Col, Button, UncontrolledTooltip, 
-  Modal, ModalHeader, ModalBody, ModalFooter, 
-  Form 
+  Modal, ModalHeader, ModalBody, Form, 
+  ModalFooter
 } from 'reactstrap'
-import { Input, TimeMask } from '../components'
+import { ActionButton, Input, TimeMask } from '../components'
 
 // Countdown
 import Countdown from 'react-countdown'
@@ -116,9 +116,7 @@ const Home = () => {
           </ModalBody>
 
           <ModalFooter>
-            <Button.Ripple type='submit' color='primary'>
-              Simpan
-            </Button.Ripple>
+            <ActionButton type='submit' />
           </ModalFooter>
         </Form>
       </Modal>
