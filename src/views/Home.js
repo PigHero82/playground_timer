@@ -38,31 +38,6 @@ const Home = () => {
   // States
   const [modal, setModal] = useState(false)
 
-  const renderer = ({ hours, minutes, seconds, api }) => (
-    <Fragment>
-      <CardBody>
-        <Card className='bg-secondary rounded-circle mx-auto' style={{ width: '230px', height: '230px' }}>
-          <Card className='rounded-circle m-auto' style={{ height: '90%', width: '90%' }}>
-            <div className='m-auto'>
-              <h1>
-                {(`0${hours}`).slice(-2)}:{(`0${minutes}`).slice(-2)}:{(`0${seconds}`).slice(-2)}
-              </h1>
-            </div>
-          </Card>
-        </Card>
-
-        <div className='d-flex justify-content-center'>
-          <Button.Ripple className='btn-icon rounded-circle mx-50' color='primary' onClick={api.isPaused() || api.isStopped() ? api.start : api.pause}>
-            {api.isPaused() || api.isStopped() || api.isCompleted() ? <Play size={16} /> : <Pause size={16} />}
-          </Button.Ripple>
-          <Button.Ripple className='btn-icon rounded-circle mx-50' outline color='primary' onClick={api.stop}>
-            <Repeat size={16} />
-          </Button.Ripple>
-        </div>
-      </CardBody>
-    </Fragment>
-  )
-
   const DataModal = () => {
     const defaultValues = {
       title: '',
@@ -77,6 +52,8 @@ const Home = () => {
     const {
       register,
       handleSubmit,
+      getValues,
+      setValue,
       formState: { errors }
     } = useForm({
       defaultValues,
@@ -88,7 +65,10 @@ const Home = () => {
 
       dispatch(handleTimer({
         ...value,
-        timer: (parseInt(dataValue[2]) + (parseInt(dataValue[1]) * 60) + (parseInt(dataValue[0]) * 60 * 60)) * 1000
+        status: 'stopped',
+        timer: (parseInt(dataValue[2]) + (parseInt(dataValue[1]) * 60) + (parseInt(dataValue[0]) * 60 * 60)) * 1000,
+        pausedTime: (parseInt(dataValue[2]) + (parseInt(dataValue[1]) * 60) + (parseInt(dataValue[0]) * 60 * 60)) * 1000,
+        finishedTime: new Date(new Date().getTime() + parseInt(value.timer))
       }))
 
       setModal(!modal)
@@ -108,10 +88,10 @@ const Home = () => {
             />
 
             <TimeMask
-              {...register('timer')}
               label="Timer"
-              name="timer"
               errors={errors.timer}
+              defaultValue={getValues('timer')}
+              onChange={e => setValue('timer', e.target.value)}
             />
           </ModalBody>
 
@@ -127,43 +107,113 @@ const Home = () => {
     <Fragment>
       {/* Content */}
       <Row>
-        {data.length > 0 ? data.map((val, key) => (
-          <Col lg="3" md="6" key={key}>
-            <Card>
-              <CardHeader className='d-flex justify-content-between align-items-center'>
-                <CardTitle>
-                  {val.title}
-                </CardTitle>
+        {data.length > 0 ? data.map((val, key) => {
+          let date = null
+          if (val.status === 'paused') {
+            date = new Date(new Date().getTime() + (val.pausedTime))
+          } else if (val.status === 'running') {
+            date = val.finishedTime
+          } else {
+            date = Date.now() + val.timer
+          }
 
-                <CardTitle>
-                  <Button.Ripple 
-                    className='btn-icon'
-                    color='flat-danger' 
-                    onClick={() => {
-                      const value = [...data]
-                      value.splice(key, 1)
-                      dispatch(removeTimer(value))
-                    }}
-                  >
-                    <Trash2 />
-                  </Button.Ripple>
-                </CardTitle>
-              </CardHeader>
+          return (
+            <Col lg="3" md="6" key={key}>
+              <Card>
+                <CardHeader className='d-flex justify-content-between align-items-center'>
+                  <CardTitle>
+                    {val.title}
+                  </CardTitle>
 
-              <Countdown 
-                autoStart={false} 
-                date={Date.now() + val.timer} 
-                renderer={renderer} 
-                onComplete={() => {
-                  const audio = new Audio('https://orangefreesounds.com/wp-content/uploads/2022/05/Clock-sound-effect.mp3?_=1')
-                  audio.play()
+                  <CardTitle>
+                    <Button.Ripple 
+                      className='btn-icon'
+                      color='flat-danger' 
+                      onClick={() => {
+                        const value = [...data]
+                        value.splice(key, 1)
+                        dispatch(removeTimer(value))
+                      }}
+                    >
+                      <Trash2 />
+                    </Button.Ripple>
+                  </CardTitle>
+                </CardHeader>
 
-                  Alert('warning', 'Waktu Habis', 'Waktu Telah Habis')
-                }} 
-              />
-            </Card>
-          </Col>
-        )) : (
+                <Countdown 
+                  autoStart={val.status === 'running'} 
+                  date={date}
+                  renderer={({ hours, minutes, seconds, api }) => (
+                    <Fragment>
+                      <CardBody>
+                        <Card className='bg-secondary rounded-circle mx-auto' style={{ width: '230px', height: '230px' }}>
+                          <Card className='rounded-circle m-auto' style={{ height: '90%', width: '90%' }}>
+                            <div className='m-auto'>
+                              <h1>
+                                {(`0${hours}`).slice(-2)}:{(`0${minutes}`).slice(-2)}:{(`0${seconds}`).slice(-2)}
+                              </h1>
+                            </div>
+                          </Card>
+                        </Card>
+                
+                        <div className='d-flex justify-content-center'>
+                          <Button.Ripple className='btn-icon rounded-circle mx-50' color='primary' onClick={api.isPaused() || api.isStopped() ? api.start : api.pause}>
+                            {api.isPaused() || api.isStopped() || api.isCompleted() ? <Play size={16} /> : <Pause size={16} />}
+                          </Button.Ripple>
+                          <Button.Ripple className='btn-icon rounded-circle mx-50' outline color='primary' onClick={api.stop}>
+                            <Repeat size={16} />
+                          </Button.Ripple>
+                        </div>
+                      </CardBody>
+                    </Fragment>
+                  )}
+                  onComplete={() => {
+                    // const audio = new Audio('https://orangefreesounds.com/wp-content/uploads/2022/05/Clock-sound-effect.mp3?_=1')
+                    // audio.play()
+
+                    Alert('warning', 'Waktu Habis', 'Waktu Telah Habis')
+                  }}
+                  onStart={() => {
+                    let e = null
+                    if (val.status === 'paused') {
+                      e = new Date(new Date().getTime() + val.pausedTime)
+                    } else {
+                      e = new Date(new Date().getTime() + val.timer)
+                    }
+
+                    const value = [...data]
+                    value.splice(key, 1, {
+                      ...val,
+                      status: 'running',
+                      finishedTime: e
+                    })
+                    dispatch(removeTimer(value))
+                  }}
+                  onStop={() => {
+                    const value = [...data]
+                    value.splice(key, 1, {
+                      ...val,
+                      status: 'stopped',
+                      pausedTime: new Date(new Date().getTime() + val.timer),
+                      finishedTime: new Date(new Date().getTime() + val.timer)
+                    })
+                    dispatch(removeTimer(value))
+                  }}
+                  onPause={e => {
+                    const value = [...data]
+                    value.splice(key, 1, {
+                      ...val,
+                      status: 'paused',
+                      pausedTime: e.total,
+                      finishedTime: e.total
+                    })
+                    dispatch(removeTimer(value))
+                  }}
+                />
+              </Card>
+            </Col>
+          )
+        }) : (
           <div className='text-center mt-3'>
             <h1>Tidak Ada Data</h1>
           </div>

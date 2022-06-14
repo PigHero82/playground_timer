@@ -14,10 +14,7 @@ export const timerSlice = createSlice({
     handleTimer: (state, action) => {
       const data = [
         ...state,
-        {
-          title: action.payload.title,
-          timer: action.payload.timer
-        }
+        action.payload
       ]
 
       localStorage.setItem('timerData', JSON.stringify(data))
