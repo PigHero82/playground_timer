@@ -89,7 +89,7 @@ const LoginCover = () => {
         <Card>
           <CardBody>
             <div className='text-center mb-1'>
-              <h2>Playground Timer</h2>
+              <h2>Playground Tools</h2>
             </div>
             <CardText>
               Silahkan isi kolom dibawah sebelum lanjut ke halaman berikutnya
